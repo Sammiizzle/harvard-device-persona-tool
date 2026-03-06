@@ -66,26 +66,138 @@ background:#efefef;
 margin-top:6px;
 border-radius:4px;
 }
+.site-header{
+background:#A51C30;
+color:white;
+display:flex;
+align-items:center;
+gap:20px;
+padding:15px 40px;
+box-shadow:0 2px 5px rgba(0,0,0,0.2);
+}
+
+.logo{
+height:45px;
+}
+
+.site-header h1{
+font-size:22px;
+margin:0;
+font-weight:600;
+}
+
+body{
+font-family: Arial, Helvetica, sans-serif;
+background:#f5f5f5;
+margin:0;
+}
+
+/* Harvard top bar */
+
+.topbar{
+background:#A51C30;
+height:70px;
+display:flex;
+align-items:center;
+}
+
+.topbar-container{
+width:1200px;
+margin:auto;
+}
+
+.logo{
+height:77px;
+}
+
+/* Main page area */
+
+.page-container{
+width:900px;
+margin:60px auto;
+background:white;
+padding:40px;
+box-shadow:0 2px 8px rgba(0,0,0,0.08);
+border-radius:4px;
+}
+
+h1{
+margin-top:0;
+font-size:32px;
+color:#222;
+}
+
+.subtitle{
+color:#666;
+margin-bottom:30px;
+}
+
+/* Tool input section */
+
+.tool-box{
+display:flex;
+gap:10px;
+margin-bottom:30px;
+}
+
+input{
+flex:1;
+padding:12px;
+font-size:16px;
+border:1px solid #ccc;
+border-radius:4px;
+}
+
+button{
+background:#A51C30;
+color:white;
+border:none;
+padding:12px 20px;
+font-size:16px;
+border-radius:4px;
+cursor:pointer;
+}
+
+button:hover{
+background:#8c1626;
+}
+
+/* Results card */
+
+#result{
+margin-top:30px;
+padding:25px;
+background:#fafafa;
+border:1px solid #eee;
+border-radius:4px;
+}
 
 </style>
 </head>
 <body>
+<body>
 
-<div class="header">
-Harvard University IT — Device Persona Tool
-</div>
+<header class="topbar">
+  <div class="topbar-container">
+        <img src="Logo.png" class="logo">
+  </div>
+</header>
 
-<div class="container">
+<div class="page-container">
 
-<h2>Device Recommendation</h2>
+<h1>Device Refresh Tool</h1>
 
-<p>Enter your Harvard ID to view your recommended refresh device.</p>
+<p class="subtitle">
+Enter your Harvard ID to view your recommended refresh device.
+</p>
+
+<div class="tool-box">
 
 <input type="text" id="harvardID" placeholder="Enter Harvard ID">
 
-<br><br>
-
 <button onclick="lookupUser()">Find My Recommendation</button>
+
+</div>
 
 <div id="result"></div>
 
@@ -97,25 +209,25 @@ let users = {};
 const deviceMatrix = {
 
 Fixed: [
-"Dell Pro Slim Desktop",
-"Dell Pro All-in-One",
-"iMac M4 Pro"
+  { name: "Dell Pro Slim Desktop", url: "https://www.dell.com/en-us/shop/desktop-computers/dell-pro-slim-desktop/spd/dell-pro-qcs1250-slim-desktop" },
+  { name: "Dell Pro All-in-One", url: "https://www.dell.com/en-us/shop/desktop-computers/dell-pro-24-all-in-one-plus-desktop/spd/dell-pro-qb24250-aio" },
+  { name: "iMac M4 Pro", url: "https://www.apple.com/shop/buy-mac/imac?afid=p240%7Cgo~cmp-21671578009~adg-171722772665~ad-767397586297_kwd-303871327913~dev-c~ext-~prd-~mca-~nt-search&cid=aos-us-kwgo-txt-mac--post-bts-093025-" }
 ],
 
 Core: [
-"Dell Pro Plus 13/14",
-"MacBook Air M4",
-"MacBook Pro 14 M4 Pro"
+  { name: "Dell Pro Plus 13/14", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-13-plus-laptop-or-2-in-1/spd/dell-pro-pb13250-2-in-1-laptop/bts114_pb13250_usx" },
+  { name: "MacBook Air M4", url: "https://www.apple.com/macbook-air/" },
+  { name: "MacBook Pro 14 M4 Pro", url: "https://www.apple.com/shop/buy-mac/macbook-pro" }
 ],
 
 Mobile: [
-"Dell Pro 13 Premium",
-"MacBook Air M4"
+  { name: "Dell Pro 13 Premium", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-13-premium-laptop/spd/dell-pro-13-premium" },
+  { name: "MacBook Air M4", url: "https://www.apple.com/macbook-air/" }
 ],
 
 Advanced: [
-"Dell Pro Max 14/16",
-"MacBook Pro 14 M4 Pro"
+  { name: "Dell Pro Max 14/16", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-max-14-laptop/spd/dell-pro-max-mc14250-laptop" },
+  { name: "MacBook Pro 14 M4 Pro", url: "https://www.apple.com/shop/buy-mac/macbook-pro" }
 ]
 
 };
@@ -180,11 +292,10 @@ let output = `
 <h3>Assigned Persona</h3>
 <p>${user.persona}</p>
 
-<h3>Recommended Devices</h3>
-`;
+<h3>Recommended Devices</h3>`;
 
 devices.forEach(device => {
-output += `<div class="device">${device}</div>`;
+  output += `<div class="device"><a href="${device.url}" target="_blank">${device.name}</a></div>`;
 });
 
 document.getElementById("result").innerHTML =
