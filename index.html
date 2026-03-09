@@ -286,12 +286,40 @@ let id = document.getElementById("harvardID").value.trim();
 
 let user = users[id];
 
-if(!user){
+let persona;
+
+if(user){
+
+persona = user.persona;
+
+}else{
+
+let title = prompt("User not found. Enter job title to estimate persona:");
+
+if(!title){
 
 document.getElementById("result").innerHTML =
-"<p>User not found in prototype dataset.</p>";
+"<p>No job title provided.</p>";
 
 return;
+
+}
+
+persona = inferPersonaFromTitle(title);
+
+user = {
+
+name: "Prototype User",
+jobCode: "Unknown",
+jobTitle: title,
+jobClass: "Estimated",
+jobFamily: "Estimated",
+level: "Estimated",
+persona: persona
+
+};
+
+}
 
 }
 function inferPersonaFromTitle(title){
@@ -310,8 +338,8 @@ return "Core";
 
 }
   
-let devices = deviceMatrix[user.persona];
-
+let devices = deviceMatrix[persona];
+  
 let output = `
 <h3>User Information</h3>
 <p><b>Name:</b> ${user.name}</p>
