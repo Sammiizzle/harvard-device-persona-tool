@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
 
 <head>
@@ -286,64 +285,49 @@ loadUsers();
 }
 
 function lookupUser(){
+  let id = document.getElementById("harvardID").value.trim();
+  let user = users[String(id)];
+  let persona;
 
-let id = document.getElementById("harvardID").value.trim();
-let user = users[String(id)];
-let persona;
-if(user){
-persona = user.persona;
+  if(user){
+    persona = user.persona || inferPersonaFromTitle(user.jobTitle);
+  } else {
+    let title = prompt("User not found. Enter job title to estimate persona:");
+    if(!title){
+      document.getElementById("result").innerHTML = "<p>No job title provided.</p>";
+      return;
+    }
+    persona = inferPersonaFromTitle(title);
+    user = {
+      name: "Prototype User",
+      jobCode: "Unknown",
+      jobTitle: title,
+      jobClass: "Estimated",
+      jobFamily: "Estimated",
+      level: "Estimated",
+      persona: persona
+    };
+  }
 
-}else{
+  let devices = deviceMatrix[persona] || [];  // <-- safe fallback
 
-let title = prompt("User not found. Enter job title to estimate persona:");
+  let output = `
+    <h3>User Information</h3>
+    <p><b>Name:</b> ${user.name}</p>
+    <p><b>Job Code:</b> ${user.jobCode}</p>
+    <p><b>Job Title:</b> ${user.jobTitle}</p>
+    <p><b>Job Class:</b> ${user.jobClass}</p>
+    <p><b>Job Family:</b> ${user.jobFamily}</p>
+    <p><b>Career Level:</b> ${user.level}</p>
+    <h3>Assigned Persona</h3>
+    <p>${user.persona}</p>
+    <h3>Recommended Devices</h3>`;
 
-if(!title){
+  devices.forEach(device => {
+    output += `<div class="device"><a href="${device.url}" target="_blank">${device.name}</a></div>`;
+  });
 
-document.getElementById("result").innerHTML =
-"<p>No job title provided.</p>";
-
-return;
-
-}
-
-persona = inferPersonaFromTitle(title);
-
-user = {
-
-name: "Prototype User",
-jobCode: "Unknown",
-jobTitle: title,
-jobClass: "Estimated",
-jobFamily: "Estimated",
-level: "Estimated",
-persona: persona
-
-};
-
-}
-let devices = deviceMatrix[persona];
-  
-let output = `
-<h3>User Information</h3>
-<p><b>Name:</b> ${user.name}</p>
-<p><b>Job Code:</b> ${user.jobCode}</p>
-<p><b>Job Title:</b> ${user.jobTitle}</p>
-<p><b>Job Class:</b> ${user.jobClass}</p>
-<p><b>Job Family:</b> ${user.jobFamily}</p>
-<p><b>Career Level:</b> ${user.level}</p>
-
-<h3>Assigned Persona</h3>
-<p>${user.persona}</p>
-
-<h3>Recommended Devices</h3>`;
-
-devices.forEach(device => {
-  output += `<div class="device"><a href="${device.url}" target="_blank">${device.name}</a></div>`;
-});
-
-document.getElementById("result").innerHTML =
-`<div class="resultCard">${output}</div>`;
-
+  document.getElementById("result").innerHTML = `<div class="resultCard">${output}</div>`;
 }
 }
 
