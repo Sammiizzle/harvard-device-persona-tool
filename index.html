@@ -175,7 +175,6 @@ border-radius:4px;
 </style>
 </head>
 <body>
-<body>
 
 <header class="topbar">
   <div class="topbar-container">
@@ -280,16 +279,22 @@ const titlePersonaMap = {
 };
 loadUsers();
 
+  function inferPersonaFromTitle(title){
+  title = title.toLowerCase();
+  for(const key in titlePersonaMap){
+    if(title.includes(key)){
+      return titlePersonaMap[key];
+    }
+  }
+  return "Core";
+}
+
 function lookupUser(){
 
 let id = document.getElementById("harvardID").value.trim();
-
 let user = users[id];
-
 let persona;
-
 if(user){
-
 persona = user.persona;
 
 }else{
@@ -320,24 +325,6 @@ persona: persona
 };
 
 }
-
-}
-function inferPersonaFromTitle(title){
-
-title = title.toLowerCase();
-
-for(const key in titlePersonaMap){
-
-if(title.includes(key)){
-return titlePersonaMap[key];
-}
-
-}
-
-return "Core";
-
-}
-  
 let devices = deviceMatrix[persona];
   
 let output = `
@@ -360,6 +347,23 @@ devices.forEach(device => {
 
 document.getElementById("result").innerHTML =
 `<div class="resultCard">${output}</div>`;
+}
+
+}
+function inferPersonaFromTitle(title){
+
+title = title.toLowerCase();
+
+for(const key in titlePersonaMap){
+
+if(title.includes(key)){
+return titlePersonaMap[key];
+}
+
+}
+
+return "Core";
+
 }
 
 </script>
