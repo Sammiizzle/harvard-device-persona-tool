@@ -294,7 +294,22 @@ document.getElementById("result").innerHTML =
 return;
 
 }
+function inferPersonaFromTitle(title){
 
+title = title.toLowerCase();
+
+for(const key in titlePersonaMap){
+
+if(title.includes(key)){
+return titlePersonaMap[key];
+}
+
+}
+
+return "Core";
+
+}
+  
 let devices = deviceMatrix[user.persona];
 
 let output = `
