@@ -347,18 +347,6 @@ devices.forEach(device => {
 
 document.getElementById("result").innerHTML =
 `<div class="resultCard">${output}</div>`;
-}
-
-}
-function inferPersonaFromTitle(title){
-
-title = title.toLowerCase();
-
-for(const key in titlePersonaMap){
-
-if(title.includes(key)){
-return titlePersonaMap[key];
-}
 
 }
 
