@@ -102,7 +102,6 @@
 </head>
 
 <body>
-
   <header class="topbar">
     <div class="topbar-container">
       <img src="HarvardLogo.png" class="logo" alt="Harvard Logo">
@@ -110,7 +109,6 @@
   </header>
 
   <div class="page-container">
-
     <h1>Device Refresh Tool</h1>
     <p class="subtitle">Enter your Harvard ID to view your recommended refresh device.</p>
 
@@ -124,6 +122,7 @@
 
   <script>
     let users = {};
+
     const deviceMatrix = {
       Fixed: [
         { name: "Dell Pro Slim Desktop", url: "https://www.dell.com/en-us/shop/desktop-computers/dell-pro-slim-desktop/spd/dell-pro-qcs1250-slim-desktop" },
@@ -156,13 +155,22 @@
       "lab": "Mobile"
     };
 
+    function inferPersonaFromTitle(title) {
+      title = title.toLowerCase();
+      for (const key in titlePersonaMap) {
+        if (title.includes(key)) return titlePersonaMap[key];
+      }
+      return "Core";
+    }
+
     async function loadUsers() {
       try {
-        const response = await fetch("https://raw.githubusercontent.com/Sammiizzle/harvard-device-persona-tool/refs/heads/main/users.csv");
+        const response = await fetch("users.csv");
         const data = await response.text();
         const rows = data.split("\n").slice(1);
+
         rows.forEach(row => {
-          if (!row.trim()) return; // skip blank rows
+          if (!row.trim()) return;
           const cols = row.split(",");
           const id = cols[0].trim();
           users[id] = {
@@ -172,81 +180,76 @@
             jobClass: cols[4] || "Unknown",
             jobFamily: cols[5] || "Unknown",
             level: cols[6] || "Unknown",
-            persona: cols[7] || inferPersonaFromTitle(cols[3] || "")
+            persona: cols[7] ? capitalize(cols[7].trim()) : inferPersonaFromTitle(cols[3])
           };
         });
+
         console.log("Users loaded:", users);
         document.getElementById("lookupBtn").disabled = false;
+
       } catch (error) {
         console.error("Error loading CSV:", error);
         document.getElementById("result").innerHTML = "<p style='color:red;'>Failed to load user data. Make sure users.csv is in the same folder.</p>";
       }
     }
 
-    function inferPersonaFromTitle(title) {
-      title = title.toLowerCase();
-      for (const key in titlePersonaMap) {
-        if (title.includes(key)) return titlePersonaMap[key];
-      }
-      return "Core";
+    function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     }
 
     function lookupUser() {
-  let id = document.getElementById("harvardID").value.trim();
-  if (!id) {
-    document.getElementById("result").innerHTML = "<p>Please enter a Harvard ID.</p>";
-    return;
-  }
+      let id = document.getElementById("harvardID").value.trim();
+      if (!id) {
+        document.getElementById("result").innerHTML = "<p>Please enter a Harvard ID.</p>";
+        return;
+      }
 
-  let user = users[String(id)];
-  let persona;
+      let user = users[id];
+      let persona = user ? user.persona : null;
 
-  if (user) {
-    persona = user.persona || inferPersonaFromTitle(user.jobTitle);
-  } else {
-    let title = prompt("User not found. Enter job title to estimate persona:");
-    if (!title) {
-      document.getElementById("result").innerHTML = "<p>No job title provided.</p>";
-      return;
+      if (!user) {
+        let title = prompt("User not found. Enter job title to estimate persona:");
+        if (!title) {
+          document.getElementById("result").innerHTML = "<p>No job title provided.</p>";
+          return;
+        }
+        persona = inferPersonaFromTitle(title);
+        user = {
+          name: "Prototype User",
+          jobCode: "Unknown",
+          jobTitle: title,
+          jobClass: "Estimated",
+          jobFamily: "Estimated",
+          level: "Estimated",
+          persona: persona
+        };
+      }
+
+      // Normalize persona to match deviceMatrix keys
+      let personaKey = capitalize(persona);
+      let devices = deviceMatrix[personaKey] || [];
+
+      let output = `
+        <h3>User Information</h3>
+        <p><b>Name:</b> ${user.name}</p>
+        <p><b>Job Code:</b> ${user.jobCode}</p>
+        <p><b>Job Title:</b> ${user.jobTitle}</p>
+        <p><b>Job Class:</b> ${user.jobClass}</p>
+        <p><b>Job Family:</b> ${user.jobFamily}</p>
+        <p><b>Career Level:</b> ${user.level}</p>
+        <h3>Assigned Persona</h3>
+        <p>${user.persona}</p>
+        <h3>Recommended Devices</h3>`;
+
+      devices.forEach(device => {
+        output += `<div class="device"><a href="${device.url}" target="_blank">${device.name}</a></div>`;
+      });
+
+      document.getElementById("result").innerHTML = `<div class="resultCard">${output}</div>`;
     }
-    persona = inferPersonaFromTitle(title);
-    user = {
-      name: "Prototype User",
-      jobCode: "Unknown",
-      jobTitle: title,
-      jobClass: "Estimated",
-      jobFamily: "Estimated",
-      level: "Estimated",
-      persona: persona
-    };
-  }
-
-  // Normalize persona key to match deviceMatrix
-  let personaKey = persona.charAt(0).toUpperCase() + persona.slice(1).toLowerCase();
-  let devices = deviceMatrix[personaKey] || [];
-
-  let output = `
-    <h3>User Information</h3>
-    <p><b>Name:</b> ${user.name}</p>
-    <p><b>Job Code:</b> ${user.jobCode}</p>
-    <p><b>Job Title:</b> ${user.jobTitle}</p>
-    <p><b>Job Class:</b> ${user.jobClass}</p>
-    <p><b>Job Family:</b> ${user.jobFamily}</p>
-    <p><b>Career Level:</b> ${user.level}</p>
-    <h3>Assigned Persona</h3>
-    <p>${user.persona}</p>
-    <h3>Recommended Devices</h3>`;
-
-  devices.forEach(device => {
-    output += `<div class="device"><a href="${device.url}" target="_blank">${device.name}</a></div>`;
-  });
-
-  document.getElementById("result").innerHTML = `<div class="resultCard">${output}</div>`;
- }
 
     loadUsers();
   </script>
-
 </body>
 
 </html>
