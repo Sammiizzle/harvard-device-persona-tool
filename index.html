@@ -234,16 +234,12 @@ Advanced: [
 };
 
 async function loadUsers() {
-
 const response = await fetch("users.csv");
 const data = await response.text();
-
 const rows = data.split("\n").slice(1);
 
 rows.forEach(row => {
-
 const cols = row.split(",");
-
 const id = cols[0].trim();
 
 users[id] = {
@@ -352,7 +348,5 @@ document.getElementById("result").innerHTML =
 }
 
 </script>
-
 </body>
-
 </html>
