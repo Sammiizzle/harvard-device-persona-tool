@@ -263,12 +263,26 @@ console.log("Users loaded:", users);
 document.getElementById("lookupBtn").disabled = false;
 
 }
+  
+const titlePersonaMap = {
 
+"administrative": "Core",
+"coordinator": "Core",
+
+"engineer": "Advanced",
+"developer": "Advanced",
+"director": "Advanced",
+"manager": "Advanced",
+
+"research": "Mobile",
+"lab": "Mobile"
+
+};
 loadUsers();
 
 function lookupUser(){
 
-let id = document.getElementById("harvardID").value;
+let id = document.getElementById("harvardID").value.trim();
 
 let user = users[id];
 
