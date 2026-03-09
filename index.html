@@ -288,7 +288,7 @@ loadUsers();
 function lookupUser(){
 
 let id = document.getElementById("harvardID").value.trim();
-let user = users[id];
+let user = users[String(id)];
 let persona;
 if(user){
 persona = user.persona;
