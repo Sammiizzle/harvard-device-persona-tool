@@ -98,7 +98,7 @@
       background: #fafafa;
       border-left: 5px solid #A51C30;
       border-radius: 6px;
-      overflow-wrap: break-word;   /* prevents very long URLs from breaking layout */
+      overflow-wrap: break-word;
     }
   </style>
 </head>
@@ -198,7 +198,7 @@
     } catch (error) {
       console.error("Error loading CSV:", error);
       document.getElementById("result").innerHTML = "<p style='color:red;'>Error: Could not load user data. Check if users.csv is in the correct folder.</p>";
-      // Optional: Enable button anyway so people can use the "Title prompt" fallback
+      // Optional: Enable button anyway so people can use the "Title prompt" fallback- or are we going by job code?
       document.getElementById("lookupBtn").disabled = false;
     }
   }
@@ -252,11 +252,9 @@
     document.getElementById("result").innerHTML = `<div class="resultCard">${output}</div>`;
   }
 
-  // --- INITIALIZATION ---
-  // These run as soon as the script loads
+  // These run as soon as the script loads -- I THINK THIS IS ADEQUAT? ;/
   loadUsers();
 
-  // Attach the Enter key listener to the input field
   document.getElementById("harvardID").addEventListener("keypress", function(event) {
     if (event.key === "Enter") {
       event.preventDefault(); 
