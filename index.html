@@ -182,9 +182,9 @@
         const id = cols[0].trim();
         users[id] = {
           name: cols[1] || "Unknown",
-          classDescription: cols[2] || "Unknown",
-          jobFamily: cols[3] || "Unknown",
-          jobTitledescription: cols[4] || "Unknown",
+          classdescription: cols[2] || "Unknown",
+          jobfamily: cols[3] || "Unknown",
+          jobtitle: cols[4] || "Unknown",
           businesstitle: cols[5] || "Unknown",
           persona: cols[7] ? capitalize(cols[7].trim()) : inferPersonaFromTitle(cols[3] || "")
         };
