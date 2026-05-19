@@ -112,11 +112,11 @@
 
   <div class="page-container">
     <h1>Device Refresh Tool</h1>
-    <p class="subtitle">Enter your Harvard ID to view your recommended refresh device.</p>
+    <p class="subtitle">Enter your Harvard ID</p>
 
     <div class="tool-box">
       <input type="text" id="harvardID" placeholder="Enter Harvard ID">
-      <button id="lookupBtn" onclick="lookupUser()" disabled>Find My Recommendation</button>
+      <button id="lookupBtn" onclick="lookupUser()", onenter="lookupUser()", disabled>Find My Recommendation</button>
     </div>
 
     <div id="result"></div>
@@ -157,7 +157,7 @@
     "lab": "Mobile"
   };
 
-  function inferPersonaFromTitle(title) {
+  function inferPersonaFromUser(title) {
     title = title.toLowerCase();
     for (const key in titlePersonaMap) {
       if (title.includes(key)) return titlePersonaMap[key];
@@ -258,7 +258,7 @@
 
   document.getElementById("harvardID").addEventListener("keypress", function(event) {
     if (event.key === "Enter") {
-      event.preventDefault(); 
+      event.preventDefault();
       lookupUser();
     }
   });
