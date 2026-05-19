@@ -183,7 +183,7 @@
         const id = cols[0].trim();
         users[id] = {
           name: cols[1] || "Unknown",
-          classDescription: cols[2] || "Unknown",
+          classdescription: cols[2] || "Unknown",
           jobfamily: cols[3] || "Unknown",
           jobtitle: cols[4] || "Unknown",
           businesstitle: cols[5] || "Unknown",
@@ -197,7 +197,6 @@
     } catch (error) {
       console.error("Error loading CSV:", error);
       document.getElementById("result").innerHTML = "<p style='color:red;'>Error: Could not load user data. Check if users.csv is in the correct folder.</p>";
-      // Optional: Enable button anyway so people can use the "Title prompt" fallback- or are we going by job code?
       document.getElementById("lookupBtn").disabled = false;
     }
   }
