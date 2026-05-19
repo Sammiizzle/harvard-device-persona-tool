@@ -158,7 +158,7 @@
   };
 
   function inferPersonaFromTitle(title) {
-    title = title.toLowerCase();
+    title = title.toUpperCase();
     for (const key in titlePersonaMap) {
       if (title.includes(key)) return titlePersonaMap[key];
     }
