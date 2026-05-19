@@ -123,39 +123,26 @@
   </div>
 
   <script>
-  let persona = {};
+  let users = {};
 
   const deviceMatrix = {
-    Academic & Administrative Professional Users- Fixed: [
-      { name: "Dell Pro Slim Desktop, Ultra 5, 32 GB RAM, 512 GB SSD", url: "https://www.dell.com/en-us/shop/desktop-computers/dell-pro-slim-desktop/spd/dell-pro-qcs1250-slim-desktop" },
-      { name: "Dell Pro All-in-One 25, Ultra 5, 32 GB RAM, 512 GB SSD​", url: "https://www.dell.com/en-us/shop/desktop-computers/dell-pro-24-all-in-one-plus-desktop/spd/dell-pro-qb24250-aio" },
-      { name: "iMac, M5 Pro, 24 GB RAM, 1 TB SSD", url: "https://www.apple.com/shop/buy-mac/imac" },
+    Fixed: [
+      { name: "Dell Pro Slim Desktop", url: "https://www.dell.com/en-us/shop/desktop-computers/dell-pro-slim-desktop/spd/dell-pro-qcs1250-slim-desktop" },
+      { name: "Dell Pro All-in-One", url: "https://www.dell.com/en-us/shop/desktop-computers/dell-pro-24-all-in-one-plus-desktop/spd/dell-pro-qb24250-aio" },
+      { name: "iMac M4 Pro", url: "https://www.apple.com/shop/buy-mac/imac" }
     ],
-    Power & Specialist Users- Core: [
-      { name: "Dell Pro Max Premium 14 or 16, Ultra 7, 32 GB RAM, 512 GB SSD", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-13-plus-laptop-or-2-in-1/spd/dell-pro-pb13250-2-in-1-laptop/bts114_pb13250_usx" },
-      { name: "MacBook Pro 14- or 16-inch, M5 Pro, 24 GB RAM, 1 TB SSD", url: "https://www.apple.com/macbook-air/" },
+    Core: [
+      { name: "Dell Pro Plus 13/14", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-13-plus-laptop-or-2-in-1/spd/dell-pro-pb13250-2-in-1-laptop/bts114_pb13250_usx" },
+      { name: "MacBook Air M4", url: "https://www.apple.com/macbook-air/" },
+      { name: "MacBook Pro 14 M4 Pro", url: "https://www.apple.com/shop/buy-mac/macbook-pro" }
     ],
-    Academic & Administrative Professional Users​- Core: [
-      { name: "Dell Pro 13/14 Plus, Ultra 5, 32 GB RAM, 512 GB SSD​", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-13-plus-laptop-or-2-in-1/spd/dell-pro-pb13250-2-in-1-laptop/bts114_pb13250_usx" },
-      { name: "MacBook Air, M5, 16 GB RAM, 1 TB SSD", url: "https://www.apple.com/macbook-air/" },
-      { name: "MacBook Pro 14-inch, M5 Pro, 24 GB RAM, 1 TB SSD", url: "https://www.apple.com/shop/buy-mac/macbook-pro" },
+    Mobile: [
+      { name: "Dell Pro 13 Premium", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-13-premium-laptop/spd/dell-pro-13-premium" },
+      { name: "MacBook Air M4", url: "https://www.apple.com/macbook-air/" }
     ],
-    Power & Specialist Users- Mobile: [
-      { name: "Dell Pro 13 Plus 2-in-1, Ultra 7, 32 GB RAM, 512 GB SSD​", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-13-premium-laptop/spd/dell-pro-13-premium" },
-      { name: "MacBook Pro 14-inch, M5 Pro, 24 GB RAM, 1 TB SSD", url: "https://www.apple.com/macbook-air/" },
-    ],
-    Academic & Administrative Professional Users- Mobile: [
-      { name: "Dell Pro 13 Premium, Ultra 5, 32 GB RAM, 512 GB SSD​", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-13-premium-laptop/spd/dell-pro-13-premium" },
-      { name: "MacBook Air, M5, 16 GB RAM, 1 TB SSD", url: "https://www.apple.com/macbook-air/" },
-    ],
-    Academic & Administrative Professional Users​- Advanced: [
+    Advanced: [
       { name: "Dell Pro Max 14/16", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-max-14-laptop/spd/dell-pro-max-mc14250-laptop" },
-      { name: "MacBook Pro 14 M5 Pro", url: "https://www.apple.com/shop/buy-mac/macbook-pro" },
-    ],
-    Power & Specialist Users- Advanced: [
-      { name: "Dell Pro Max Plus 16 or 18, Ultra 7 or 9, 32 GB RAM, 512 GB SSD", url: "" },
-      { name: "MacBook Pro 14- or 16-inch, M5 Max, 36 GB RAM, 1 TB SSD​", url: "" },
-      { name: "Dell Pro Max Tower, Ultra 7 or 9, 32 GB RAM, 512 GB SSD​", url: ""},
+      { name: "MacBook Pro 14 M4 Pro", url: "https://www.apple.com/shop/buy-mac/macbook-pro" }
     ]
   };
 
@@ -163,14 +150,15 @@
     "Academic & Administrative Professional Users​- Advanced": "Dell Pro Max 14 or 16, Ultra 7, 32 GB RAM, 512 GB SSD​, MacBook Pro 14- or 16-inch, M5 Pro, 24 GB RAM, 1 TB SSD",
     "Academic & Administrative Professional Users​- Core": "Dell Pro 13/14 Plus, Ultra 5, 32 GB RAM, 512 GB SSD​, MacBook Air, M5, 16 GB RAM, 1 TB SSD, MacBook Pro 14-inch, M5 Pro, 24 GB RAM, 1 TB SSD",
     "Academic & Administrative Professional Users- Mobile": "Dell Pro 13 Premium, Ultra 5, 32 GB RAM, 512 GB SSD​, MacBook Air, M5, 16 GB RAM, 1 TB SSD",
-    "Academic & Administrative Professional Users- Fixed": "Dell Pro Slim Desktop, Ultra 5, 32 GB RAM, 512 GB SSD​, Dell Pro All-in-One 25, Ultra 5, 32 GB RAM, 512 GB SSD​, iMac, M5 Pro, 24 GB RAM, 1 TB SSD",
-    "Power & Specialist Users- Core": "Dell Pro Max Premium 14 or 16, Ultra 7, 32 GB RAM, 512 GB SSD​, MacBook Pro 14- or 16-inch, M5 Pro, 24 GB RAM, 1 TB SSD",
-    "Power & Specialist Users- Mobile": "Dell Pro 13 Plus 2-in-1, Ultra 7, 32 GB RAM, 512 GB SSD​, MacBook Pro 14-inch, M5 Pro, 24 GB RAM, 1 TB SSD",
-    "Power & Specialist Users- Advanced": "Dell Pro Max Plus 16 or 18, Ultra 7 or 9, 32 GB RAM, 512 GB SSD​, MacBook Pro 14- or 16-inch, M5 Max, 36 GB RAM, 1 TB SSD​, Dell Pro Max Tower, Ultra 7 or 9, 32 GB RAM, 512 GB SSD​, Mac Pro, M5 Max, 36 GB RAM, 1 TB SSD",
+    "Academic & Administrative Professional Users- Fixed": "Dell Pro Slim Desktop, Ultra 5, 32 GB RAM, 512 GB SSD​, Dell Pro All-in-One 25, Ultra 5, 32 GB RAM, 512 GB SSD​, iMac, M5 Pro, 24 GB RAM, 1 TB SSD"
+    "Power & Specialist Users- Core": "Advanced",
+    "manager": "Advanced",
+    "research": "Mobile",
+    "lab": "Mobile"
   };
 
-  function inferPersonaFrompersona(persona) {
-    persona = persona.toUpperCase();
+  function inferPersonaFromTitle(title) {
+    title = title.toLowerCase();
     for (const key in titlePersonaMap) {
       if (title.includes(key)) return titlePersonaMap[key];
     }
@@ -195,9 +183,9 @@
         const id = cols[0].trim();
         users[id] = {
           name: cols[1] || "Unknown",
-          classdescription: cols[2] || "Unknown",
-          jobfamily: cols[3] || "Unknown",
-          jobtitle: cols[4] || "Unknown",
+          emplClassDescription: cols[2] || "Unknown",
+          jobFamily: cols[3] || "Unknown",
+          jobTitledescription: cols[4] || "Unknown",
           businesstitle: cols[5] || "Unknown",
           persona: cols[7] ? capitalize(cols[7].trim()) : inferPersonaFromTitle(cols[3] || "")
         };
@@ -209,6 +197,7 @@
     } catch (error) {
       console.error("Error loading CSV:", error);
       document.getElementById("result").innerHTML = "<p style='color:red;'>Error: Could not load user data. Check if users.csv is in the correct folder.</p>";
+      // Optional: Enable button anyway so people can use the "Title prompt" fallback- or are we going by job code?
       document.getElementById("lookupBtn").disabled = false;
     }
   }
@@ -226,18 +215,18 @@
     if (!user) {
       let title = prompt("User not found. Enter job title to estimate persona:");
       if (!title) {
-        document.getElementById("result").innerHTML = "<p>No job title provided or applicable.</p>";
+        document.getElementById("result").innerHTML = "<p>No job title provided.</p>";
         return;
       }
       persona = inferPersonaFromTitle(title);
       user = {
         name: "Prototype User",
         jobCode: "Unknown",
-        businesstitle: "Unknown",
-        jobtitle: title,
-        classdescription: "Estimated",
-        jobfamily: "Estimated",
-        persona: persona,
+        jobTitle: title,
+        jobClass: "Estimated",
+        jobFamily: "Estimated",
+        level: "Estimated",
+        persona: persona
       };
     } else {
       persona = user.persona;
@@ -249,10 +238,10 @@
     let output = `
       <h3>User Information</h3>
       <p><b>Name:</b> ${user.name}</p>
-      <p><b>Class:</b> ${user.classdescription}</p>
+      <p><b>Empl Class Description:</b> ${user.emplclassdescription}</p>
       <p><b>Job Family:</b> ${user.jobfamily}</p>
-      <p><b>Job Title:</b> ${user.jobtitle}</p>
-      <p><b>Business Title:</b> ${user.businesstitle}</p>
+      <p><b>Job Title / Descr:</b> ${user.jobtitledescription}</p>
+      <p><b>Business Title / Descr:</b> ${user.businesstitle}</p>
       <hr>
       <h3>Assigned Persona: <span style="color: #A51C30;">${personaKey}</span></h3>
       <h3>Recommended Devices</h3>`;
