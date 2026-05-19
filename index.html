@@ -112,11 +112,11 @@
 
   <div class="page-container">
     <h1>Device Refresh Tool</h1>
-    <p class="subtitle">Enter your Harvard ID</p>
+    <p class="subtitle">Enter your Harvard ID to view your recommended refresh device.</p>
 
     <div class="tool-box">
       <input type="text" id="harvardID" placeholder="Enter Harvard ID">
-      <button id="lookupBtn" onclick="lookupUser()", onenter="lookupUser()", disabled>Find My Recommendation</button>
+      <button id="lookupBtn" onclick="lookupUser()" disabled>Find My Recommendation</button>
     </div>
 
     <div id="result"></div>
@@ -147,17 +147,17 @@
   };
 
   const titlePersonaMap = {
-    "Academic & Administrative Professional Users​- Advanced": "Dell Pro Max 14 or 16, Ultra 7, 32 GB RAM, 512 GB SSD​, MacBook Pro 14- or 16-inch, M5 Pro, 24 GB RAM, 1 TB SSD",
-    "Academic & Administrative Professional Users​- Core": "Dell Pro 13/14 Plus, Ultra 5, 32 GB RAM, 512 GB SSD​, MacBook Air, M5, 16 GB RAM, 1 TB SSD, MacBook Pro 14-inch, M5 Pro, 24 GB RAM, 1 TB SSD",
-    "Academic & Administrative Professional Users- Mobile": "Dell Pro 13 Premium, Ultra 5, 32 GB RAM, 512 GB SSD​, MacBook Air, M5, 16 GB RAM, 1 TB SSD",
-    "Academic & Administrative Professional Users- Fixed": "Dell Pro Slim Desktop, Ultra 5, 32 GB RAM, 512 GB SSD​, Dell Pro All-in-One 25, Ultra 5, 32 GB RAM, 512 GB SSD​, iMac, M5 Pro, 24 GB RAM, 1 TB SSD"
-    "Power & Specialist Users- Core": "Advanced",
+    "administrative": "Core",
+    "coordinator": "Core",
+    "engineer": "Advanced",
+    "developer": "Advanced",
+    "director": "Advanced",
     "manager": "Advanced",
     "research": "Mobile",
     "lab": "Mobile"
   };
 
-  function inferPersonaFromUser(title) {
+  function inferPersonaFromTitle(title) {
     title = title.toLowerCase();
     for (const key in titlePersonaMap) {
       if (title.includes(key)) return titlePersonaMap[key];
@@ -258,7 +258,7 @@
 
   document.getElementById("harvardID").addEventListener("keypress", function(event) {
     if (event.key === "Enter") {
-      event.preventDefault();
+      event.preventDefault(); 
       lookupUser();
     }
   });
