@@ -183,9 +183,9 @@
         const id = cols[0].trim();
         users[id] = {
           name: cols[1] || "Unknown",
-          emplClassDescription: cols[2] || "Unknown",
-          jobFamily: cols[3] || "Unknown",
-          jobTitledescription: cols[4] || "Unknown",
+          classDescription: cols[2] || "Unknown",
+          jobfamily: cols[3] || "Unknown",
+          jobtitle: cols[4] || "Unknown",
           businesstitle: cols[5] || "Unknown",
           persona: cols[7] ? capitalize(cols[7].trim()) : inferPersonaFromTitle(cols[3] || "")
         };
@@ -238,9 +238,9 @@
     let output = `
       <h3>User Information</h3>
       <p><b>Name:</b> ${user.name}</p>
-      <p><b>Class:</b> ${user.emplclassdescription}</p>
+      <p><b>Class:</b> ${user.classdescription}</p>
       <p><b>Job Family:</b> ${user.jobfamily}</p>
-      <p><b>Job Title:</b> ${user.jobtitledescription}</p>
+      <p><b>Job Title:</b> ${user.jobtitle}</p>
       <p><b>Business Title:</b> ${user.businesstitle}</p>
       <hr>
       <h3>Assigned Persona: <span style="color: #A51C30;">${personaKey}</span></h3>
