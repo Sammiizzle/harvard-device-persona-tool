@@ -243,7 +243,8 @@
       <p><b>Business Title:</b> ${user.businesstitle}</p>
       <hr>
       
-      <h3><b>USER PERSONA:</b> <span style="color: #A51C30;">${user.persona}</span></p></h3>
+      <h3><b>PERSONA:</b> <span style="color: #A51C30;">${user.persona}</span></p></h3>
+      <hr>
       <h3>Recommended Devices</h3>`;
 
     devices.forEach(device => {
@@ -253,7 +254,6 @@
     document.getElementById("result").innerHTML = `<div class="resultCard">${output}</div>`;
   }
 
-  // These run as soon as the script loads -- I THINK THIS IS ADEQUAT? ;/
   loadUsers();
 
   document.getElementById("harvardID").addEventListener("keypress", function(event) {
