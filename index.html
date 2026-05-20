@@ -116,7 +116,6 @@
 
     <div class="tool-box">
       <input type="text" id="harvardID" placeholder="Enter Harvard ID">
-      <!-- Button is enabled by default now -->
       <button id="lookupBtn" onclick="lookupUser()">Find My Recommendation</button>
     </div>
 
@@ -124,8 +123,7 @@
   </div>
 
   <script>
-    // === 1. Embed your CSV directly here so we don't need fetch() ===
-    const csvData = `
+  const csvData = `
 Harvard ID,Name,classdescription,jobfamily,jobtitle,businesstitle,persona
 60846642,Eric Thompson,Admin & Professional,IT Enterprise Management,IT Service Management Mgt V,Associate Director, Endpoint Solutions,Power & Specialist Users- Core,
 60917469,Bailey Andrews,Admin & Professional,IT Project Management,IT Program Manager V,IT Program Manager, Endpoint Solutions,Academic & Administrative Professional Users- Advanced,
@@ -135,7 +133,6 @@ Harvard ID,Name,classdescription,jobfamily,jobtitle,businesstitle,persona
 11276555,Junda Sun,Admin & Professional,Not Assigned,Software Engineer Sr,Associate Systems Engineer,Power & Specialist Users- Advanced
 `.trim();
 
-    // === 2. Device options by core persona group ===
     const deviceMatrix = {
       Fixed: [
         { name: "Dell Pro Slim Desktop", url: "https://www.dell.com/en-us/shop/desktop-computers/dell-pro-slim-desktop/spd/dell-pro-qcs1250-slim-desktop" },
@@ -157,10 +154,8 @@ Harvard ID,Name,classdescription,jobfamily,jobtitle,businesstitle,persona
       ]
     };
 
-    // Will hold parsed users keyed by Harvard ID
     const users = {};
 
-    // === 3. Helper: map full persona labels to the core group we use for devices ===
     function mapPersonaToGroup(personaLabel) {
       if (!personaLabel) return "Core";
       const p = personaLabel.toLowerCase();
@@ -170,7 +165,6 @@ Harvard ID,Name,classdescription,jobfamily,jobtitle,businesstitle,persona
       if (p.includes("fixed")) return "Fixed";
       if (p.includes("core")) return "Core";
 
-      // default safety
       return "Core";
     }
 
@@ -179,7 +173,6 @@ Harvard ID,Name,classdescription,jobfamily,jobtitle,businesstitle,persona
       return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     }
 
-    // === 4. Parse the embedded CSV into `users` object ===
     function loadUsersFromEmbeddedCSV() {
       const lines = csvData.split(/\r?\n/);
       // First row is header
@@ -190,17 +183,6 @@ Harvard ID,Name,classdescription,jobfamily,jobtitle,businesstitle,persona
 
         const cols = line.split(",");
 
-        // Because business title contains commas and there's a trailing comma,
-        // we reconstruct columns like this:
-        //
-        // 0: Harvard ID
-        // 1: Name
-        // 2: classdescription
-        // 3: jobfamily
-        // 4: jobtitle
-        // 5..(n-2): businesstitle (may contain commas)
-        // (n-2): persona
-        // (n-1): "" (if there was a trailing comma)
         const id = (cols[0] || "").trim();
         if (!id) return;
 
@@ -209,11 +191,9 @@ Harvard ID,Name,classdescription,jobfamily,jobtitle,businesstitle,persona
         const jobfamily = (cols[3] || "Unknown").trim();
         const jobtitle = (cols[4] || "Unknown").trim();
 
-        // persona is second-to-last column (because there's often a trailing comma)
         const personaIndex = cols.length - 2;
         let personaLabel = (cols[personaIndex] || "").trim();
 
-        // business title is everything between index 5 and personaIndex
         let businesstitle = "";
         if (personaIndex > 5) {
           businesstitle = cols.slice(5, personaIndex).join(",").trim();
@@ -234,7 +214,6 @@ Harvard ID,Name,classdescription,jobfamily,jobtitle,businesstitle,persona
       console.log("Parsed users:", users);
     }
 
-    // === 5. Main lookup ===
     function lookupUser() {
       const id = document.getElementById("harvardID").value.trim();
       const resultDiv = document.getElementById("result");
@@ -250,9 +229,7 @@ Harvard ID,Name,classdescription,jobfamily,jobtitle,businesstitle,persona
       let safetyNetApplied = false;
 
       if (!user) {
-        // SAFETY NET:
-        // For any unfound Harvard ID, route them to:
-        // "Academic & Administrative Professional Users- Core"
+
         safetyNetApplied = true;
 
         personaLabel = "Academic & Administrative Professional Users- Core";
@@ -313,7 +290,6 @@ Harvard ID,Name,classdescription,jobfamily,jobtitle,businesstitle,persona
       resultDiv.innerHTML = `<div class="resultCard">${output}</div>`;
     }
 
-    // === 6. Init: parse CSV & enable Enter key ===
     loadUsersFromEmbeddedCSV();
 
     document.getElementById("harvardID").addEventListener("keypress", function (event) {
