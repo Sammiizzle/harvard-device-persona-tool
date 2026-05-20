@@ -116,16 +116,26 @@
 
     <div class="tool-box">
       <input type="text" id="harvardID" placeholder="Enter Harvard ID">
-      <button id="lookupBtn" onclick="lookupUser()" disabled>Find My Recommendation</button>
+      <!-- Button is enabled by default now -->
+      <button id="lookupBtn" onclick="lookupUser()">Find My Recommendation</button>
     </div>
 
     <div id="result"></div>
   </div>
 
   <script>
-    let users = {};
+    // === 1. Embed your CSV directly here so we don't need fetch() ===
+    const csvData = `
+Harvard ID,Name,classdescription,jobfamily,jobtitle,businesstitle,persona
+60846642,Eric Thompson,Admin & Professional,IT Enterprise Management,IT Service Management Mgt V,Associate Director, Endpoint Solutions,Power & Specialist Users- Core,
+60917469,Bailey Andrews,Admin & Professional,IT Project Management,IT Program Manager V,IT Program Manager, Endpoint Solutions,Academic & Administrative Professional Users- Advanced,
+81401640,Jenn Vasconcelos,Admin & Professional,IT Enterprise Management,IT Service Management Mgt V,Associate Director, Client Services Project Management Office,Power & Specialist Users- Core,
+71775372,Samantha Diaz,Admin & Professional,Administrative/Refresh Coordinator,IT Procurement and Refresh,Not applicable,Academic & Administrative Professional Users- Core,
+80849052,Brian Weeks,Admin & Professional,Not Assigned,Software Engineer,Associate Systems Engineer,Power & Specialist Users- Advanced,
+11276555,Junda Sun,Admin & Professional,Not Assigned,Software Engineer Sr,Associate Systems Engineer,Power & Specialist Users- Advanced
+`.trim();
 
-    // Device options by persona
+    // === 2. Device options by core persona group ===
     const deviceMatrix = {
       Fixed: [
         { name: "Dell Pro Slim Desktop", url: "https://www.dell.com/en-us/shop/desktop-computers/dell-pro-slim-desktop/spd/dell-pro-qcs1250-slim-desktop" },
@@ -147,26 +157,20 @@
       ]
     };
 
-    // Optional inference from title if CSV persona missing
-    const titlePersonaMap = {
-      "administrative": "Core",
-      "coordinator": "Core",
-      "engineer": "Advanced",
-      "developer": "Advanced",
-      "director": "Advanced",
-      "manager": "Advanced",
-      "research": "Mobile",
-      "lab": "Mobile"
-    };
+    // Will hold parsed users keyed by Harvard ID
+    const users = {};
 
-    function inferPersonaFromTitle(title) {
-      if (!title) return "Core";
-      const cleanTitle = title.toLowerCase();
-      for (const key in titlePersonaMap) {
-        if (cleanTitle.includes(key)) {
-          return titlePersonaMap[key];
-        }
-      }
+    // === 3. Helper: map full persona labels to the core group we use for devices ===
+    function mapPersonaToGroup(personaLabel) {
+      if (!personaLabel) return "Core";
+      const p = personaLabel.toLowerCase();
+
+      if (p.includes("advanced")) return "Advanced";
+      if (p.includes("mobile")) return "Mobile";
+      if (p.includes("fixed")) return "Fixed";
+      if (p.includes("core")) return "Core";
+
+      // default safety
       return "Core";
     }
 
@@ -175,56 +179,62 @@
       return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     }
 
-    async function loadUsers() {
-      try {
-        const response = await fetch("users.csv");
-        if (!response.ok) throw new Error("File not found");
+    // === 4. Parse the embedded CSV into `users` object ===
+    function loadUsersFromEmbeddedCSV() {
+      const lines = csvData.split(/\r?\n/);
+      // First row is header
+      const dataLines = lines.slice(1);
 
-        const data = await response.text();
-        const rows = data.split("\n").slice(1); // skip header
+      dataLines.forEach(line => {
+        if (!line.trim()) return;
 
-        rows.forEach(row => {
-          if (!row.trim()) return;
-          const cols = row.split(",");
+        const cols = line.split(",");
 
-          // Expected CSV: Harvard ID,Name,classdescription,jobfamily,jobtitle,businesstitle,persona
-          const id = (cols[0] || "").trim();
-          if (!id) return;
+        // Because business title contains commas and there's a trailing comma,
+        // we reconstruct columns like this:
+        //
+        // 0: Harvard ID
+        // 1: Name
+        // 2: classdescription
+        // 3: jobfamily
+        // 4: jobtitle
+        // 5..(n-2): businesstitle (may contain commas)
+        // (n-2): persona
+        // (n-1): "" (if there was a trailing comma)
+        const id = (cols[0] || "").trim();
+        if (!id) return;
 
-          const name = (cols[1] || "Unknown").trim();
-          const classdescription = (cols[2] || "Unknown").trim();
-          const jobfamily = (cols[3] || "Unknown").trim();
-          const jobtitle = (cols[4] || "Unknown").trim();
-          const businesstitle = (cols[5] || "Unknown").trim();
-          const personaRaw = (cols[6] || "").trim();
+        const name = (cols[1] || "Unknown").trim();
+        const classdescription = (cols[2] || "Unknown").trim();
+        const jobfamily = (cols[3] || "Unknown").trim();
+        const jobtitle = (cols[4] || "Unknown").trim();
 
-          // Use persona from CSV if present; otherwise infer from job title
-          let persona = personaRaw
-            ? capitalize(personaRaw)
-            : inferPersonaFromTitle(jobtitle);
+        // persona is second-to-last column (because there's often a trailing comma)
+        const personaIndex = cols.length - 2;
+        let personaLabel = (cols[personaIndex] || "").trim();
 
-          users[id] = {
-            name,
-            classdescription,
-            jobfamily,
-            jobtitle,
-            businesstitle,
-            persona
-          };
-        });
+        // business title is everything between index 5 and personaIndex
+        let businesstitle = "";
+        if (personaIndex > 5) {
+          businesstitle = cols.slice(5, personaIndex).join(",").trim();
+        } else {
+          businesstitle = (cols[5] || "Unknown").trim();
+        }
 
-        console.log("Users loaded successfully");
-        document.getElementById("lookupBtn").disabled = false;
+        users[id] = {
+          name,
+          classdescription,
+          jobfamily,
+          jobtitle,
+          businesstitle,
+          personaLabel // full label from CSV, e.g. "Power & Specialist Users- Core"
+        };
+      });
 
-      } catch (error) {
-        console.error("Error loading CSV:", error);
-        document.getElementById("result").innerHTML =
-          "<p style='color:red;'>Error: Could not load user data. Check if users.csv is in the correct folder.</p>";
-        document.getElementById("lookupBtn").disabled = false;
-      }
+      console.log("Parsed users:", users);
     }
 
-    // SINGLE, CLEAN lookupUser
+    // === 5. Main lookup ===
     function lookupUser() {
       const id = document.getElementById("harvardID").value.trim();
       const resultDiv = document.getElementById("result");
@@ -235,22 +245,33 @@
       }
 
       let user = users[id];
+      let personaLabel;
+      let personaGroup;
+      let safetyNetApplied = false;
 
-      // SAFETY NET: Unfound Harvard ID → Academic & Administrative Professional Users - Core
       if (!user) {
+        // SAFETY NET:
+        // For any unfound Harvard ID, route them to:
+        // "Academic & Administrative Professional Users- Core"
+        safetyNetApplied = true;
+
+        personaLabel = "Academic & Administrative Professional Users- Core";
+        personaGroup = "Core";
+
         user = {
           name: "Not found in HR file",
           classdescription: "N/A",
           jobfamily: "Academic & Administrative Professional Users​",
           jobtitle: "N/A",
           businesstitle: "N/A",
-          persona: "Core"   // Safety net persona
+          personaLabel
         };
+      } else {
+        personaLabel = user.personaLabel || "Academic & Administrative Professional Users- Core";
+        personaGroup = mapPersonaToGroup(personaLabel);
       }
 
-      const persona = user.persona || "Core";
-      const personaKey = persona; // already capitalized above
-      const devices = deviceMatrix[personaKey] || [];
+      const devices = deviceMatrix[personaGroup] || [];
 
       let output = `
         <h3>User Information</h3>
@@ -260,14 +281,25 @@
         <p><b>Job Family:</b> ${user.jobfamily}</p>
         <p><b>Job Title:</b> ${user.jobtitle}</p>
         <p><b>Business Title:</b> ${user.businesstitle}</p>
-        ${users[id] ? "" : "<p style='color:#b00;'><i>User not found in CSV. Safety net applied: Academic & Administrative Professional Users​ – Core persona.</i></p>"}
+      `;
+
+      if (safetyNetApplied) {
+        output += `
+          <p style="color:#b00;"><i>User not found in CSV. Safety net applied:
+          Academic & Administrative Professional Users​ – Core persona.</i></p>
+        `;
+      }
+
+      output += `
         <hr>
-        <h3>Persona: <span style="color: #A51C30;">${persona}</span></h3>
+        <h3>Persona:</h3>
+        <p><b>Persona Label:</b> ${personaLabel}</p>
+        <p><b>Persona Group for Devices:</b> <span style="color:#A51C30;">${personaGroup}</span></p>
         <h3>Recommended Devices</h3>
       `;
 
       if (devices.length === 0) {
-        output += `<p>No devices configured for persona "${personaKey}".</p>`;
+        output += `<p>No devices configured for persona group "${personaGroup}".</p>`;
       } else {
         devices.forEach(device => {
           output += `
@@ -281,10 +313,9 @@
       resultDiv.innerHTML = `<div class="resultCard">${output}</div>`;
     }
 
-    // Load CSV on page load
-    loadUsers();
+    // === 6. Init: parse CSV & enable Enter key ===
+    loadUsersFromEmbeddedCSV();
 
-    // Allow Enter key to trigger lookup
     document.getElementById("harvardID").addEventListener("keypress", function (event) {
       if (event.key === "Enter") {
         event.preventDefault();
