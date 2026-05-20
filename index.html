@@ -123,102 +123,100 @@
   </div>
 
   <script>
-  const csvData = `
-Harvard ID,Name,classdescription,jobfamily,jobtitle,businesstitle,persona
-60846642,Eric Thompson,Admin & Professional,IT Enterprise Management,IT Service Management Mgt V,Associate Director, Endpoint Solutions,Power & Specialist Users- Core,
-60917469,Bailey Andrews,Admin & Professional,IT Project Management,IT Program Manager V,IT Program Manager, Endpoint Solutions,Academic & Administrative Professional Users- Advanced,
-81401640,Jenn Vasconcelos,Admin & Professional,IT Enterprise Management,IT Service Management Mgt V,Associate Director, Client Services Project Management Office,Power & Specialist Users- Core,
-71775372,Samantha Diaz,Admin & Professional,Administrative/Refresh Coordinator,IT Procurement and Refresh,Not applicable,Academic & Administrative Professional Users- Core,
-80849052,Brian Weeks,Admin & Professional,Not Assigned,Software Engineer,Associate Systems Engineer,Power & Specialist Users- Advanced,
-11276555,Junda Sun,Admin & Professional,Not Assigned,Software Engineer Sr,Associate Systems Engineer,Power & Specialist Users- Advanced
-`.trim();
+
+
+    const users = {};
 
     const deviceMatrix = {
-      Fixed: [
-        { name: "Dell Pro Slim Desktop", url: "https://www.dell.com/en-us/shop/desktop-computers/dell-pro-slim-desktop/spd/dell-pro-qcs1250-slim-desktop" },
-        { name: "Dell Pro All-in-One", url: "https://www.dell.com/en-us/shop/desktop-computers/dell-pro-24-all-in-one-plus-desktop/spd/dell-pro-qb24250-aio" },
-        { name: "iMac M4 Pro", url: "https://www.apple.com/shop/buy-mac/imac" }
-      ],
       Core: [
         { name: "Dell Pro Plus 13/14", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-13-plus-laptop-or-2-in-1/spd/dell-pro-pb13250-2-in-1-laptop/bts114_pb13250_usx" },
         { name: "MacBook Air M4", url: "https://www.apple.com/macbook-air/" },
         { name: "MacBook Pro 14 M4 Pro", url: "https://www.apple.com/shop/buy-mac/macbook-pro" }
       ],
-      Mobile: [
-        { name: "Dell Pro 13 Premium", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-13-premium-laptop/spd/dell-pro-13-premium" },
-        { name: "MacBook Air M4", url: "https://www.apple.com/macbook-air/" }
-      ],
       Advanced: [
         { name: "Dell Pro Max 14/16", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-max-14-laptop/spd/dell-pro-max-mc14250-laptop" },
         { name: "MacBook Pro 14 M4 Pro", url: "https://www.apple.com/shop/buy-mac/macbook-pro" }
+      ],
+      Fixed: [
+        { name: "Dell Pro Slim Desktop", url: "https://www.dell.com/en-us/shop/desktop-computers/dell-pro-slim-desktop/spd/dell-pro-qcs1250-slim-desktop" },
+        { name: "Dell Pro All-in-One", url: "https://www.dell.com/en-us/shop/desktop-computers/dell-pro-24-all-in-one-plus-desktop/spd/dell-pro-qb24250-aio" },
+        { name: "iMac M4 Pro", url: "https://www.apple.com/shop/buy-mac/imac" }
+      ],
+      Mobile: [
+        { name: "Dell Pro 13 Premium", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-13-premium-laptop/spd/dell-pro-13-premium" },
+        { name: "MacBook Air M4", url: "https://www.apple.com/macbook-air/" }
       ]
     };
 
-    const users = {};
 
-    function mapPersonaToGroup(personaLabel) {
-      if (!personaLabel) return "Core";
-      const p = personaLabel.toLowerCase();
+    const csvText = `
+Harvard ID,Name,classdescription,jobfamily,jobtitle,businesstitle,persona
+60846642,Eric Thompson,Admin & Professional,IT Enterprise Management,IT Service Management Mgt V,Associate Director Endpoint Solutions,Power & Specialist Users- Core
+60917469,Bailey Andrews,Admin & Professional,IT Project Management,IT Program Manager V,IT Program Manager Endpoint Solutions,Academic & Administrative Professional Users- Advanced
+81401640,Jenn Vasconcelos,Admin & Professional,IT Enterprise Management,IT Service Management Mgt V,Associate Director Client Services PMO,Power & Specialist Users- Core
+71775372,Samantha Diaz,Admin & Professional,Administrative/Refresh Coordinator,IT Procurement and Refresh,Not applicable,Academic & Administrative Professional Users- Core
+80849052,Brian Weeks,Admin & Professional,Not Assigned,Software Engineer,Associate Systems Engineer,Power & Specialist Users- Advanced
+11276555,Junda Sun,Admin & Professional,Not Assigned,Software Engineer Sr,Associate Systems Engineer,Power & Specialist Users- Advanced
+`.trim();
 
-      if (p.includes("advanced")) return "Advanced";
-      if (p.includes("mobile")) return "Mobile";
-      if (p.includes("fixed")) return "Fixed";
-      if (p.includes("core")) return "Core";
+    function getPersonaGroup(personaLabel) {
+      if (!personaLabel) {
+        return "Core";
+      }
 
-      return "Core";
+      const lower = personaLabel.toLowerCase();
+
+      if (lower.includes("advanced")) {
+        return "Advanced";
+      } else if (lower.includes("mobile")) {
+        return "Mobile";
+      } else if (lower.includes("fixed")) {
+        return "Fixed";
+      } else if (lower.includes("core")) {
+        return "Core";
+      } else {
+        return "Core";
+      }
     }
 
-    function capitalize(str) {
-      if (!str) return "";
-      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-    }
+    function loadUsersFromCSV() {
+      const lines = csvText.split("\n");
 
-    function loadUsersFromEmbeddedCSV() {
-      const lines = csvData.split(/\r?\n/);
-      // First row is header
-      const dataLines = lines.slice(1);
-
-      dataLines.forEach(line => {
-        if (!line.trim()) return;
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line === "") continue;
 
         const cols = line.split(",");
 
-        const id = (cols[0] || "").trim();
-        if (!id) return;
-
-        const name = (cols[1] || "Unknown").trim();
-        const classdescription = (cols[2] || "Unknown").trim();
-        const jobfamily = (cols[3] || "Unknown").trim();
-        const jobtitle = (cols[4] || "Unknown").trim();
-
-        const personaIndex = cols.length - 2;
-        let personaLabel = (cols[personaIndex] || "").trim();
-
-        let businesstitle = "";
-        if (personaIndex > 5) {
-          businesstitle = cols.slice(5, personaIndex).join(",").trim();
-        } else {
-          businesstitle = (cols[5] || "Unknown").trim();
-        }
+        const id = cols[0].trim();
+        const name = cols[1].trim();
+        const classdescription = cols[2].trim();
+        const jobfamily = cols[3].trim();
+        const jobtitle = cols[4].trim();
+        const businesstitle = cols[5].trim();
+        const personaLabel = cols[6].trim();  
 
         users[id] = {
-          name,
-          classdescription,
-          jobfamily,
-          jobtitle,
-          businesstitle,
-          personaLabel // full label from CSV, e.g. "Power & Specialist Users- Core"
+          name: name,
+          classdescription: classdescription,
+          jobfamily: jobfamily,
+          jobtitle: jobtitle,
+          businesstitle: businesstitle,
+          personaLabel: personaLabel
         };
-      });
+      }
 
-      console.log("Parsed users:", users);
+      console.log("Users loaded:", users);
     }
 
+
     function lookupUser() {
-      const id = document.getElementById("harvardID").value.trim();
+      const idInput = document.getElementById("harvardID");
       const resultDiv = document.getElementById("result");
 
-      if (!id) {
+      const id = idInput.value.trim();
+
+      if (id === "") {
         resultDiv.innerHTML = "<p>Please enter a Harvard ID.</p>";
         return;
       }
@@ -226,11 +224,11 @@ Harvard ID,Name,classdescription,jobfamily,jobtitle,businesstitle,persona
       let user = users[id];
       let personaLabel;
       let personaGroup;
-      let safetyNetApplied = false;
+      let safetyNetUsed = false;
 
       if (!user) {
-
-        safetyNetApplied = true;
+        // Not in CSV >> force them into Academic & Administrative Professional Users - Core
+        safetyNetUsed = true;
 
         personaLabel = "Academic & Administrative Professional Users- Core";
         personaGroup = "Core";
@@ -238,59 +236,58 @@ Harvard ID,Name,classdescription,jobfamily,jobtitle,businesstitle,persona
         user = {
           name: "Not found in HR file",
           classdescription: "N/A",
-          jobfamily: "Academic & Administrative Professional Users​",
+          jobfamily: "Academic & Administrative Professional Users",
           jobtitle: "N/A",
           businesstitle: "N/A",
-          personaLabel
+          personaLabel: personaLabel
         };
       } else {
-        personaLabel = user.personaLabel || "Academic & Administrative Professional Users- Core";
-        personaGroup = mapPersonaToGroup(personaLabel);
+        personaLabel = user.personaLabel;
+        personaGroup = getPersonaGroup(personaLabel);
       }
 
       const devices = deviceMatrix[personaGroup] || [];
 
-      let output = `
-        <h3>User Information</h3>
-        <p><b>Harvard ID:</b> ${id}</p>
-        <p><b>Name:</b> ${user.name}</p>
-        <p><b>Class:</b> ${user.classdescription}</p>
-        <p><b>Job Family:</b> ${user.jobfamily}</p>
-        <p><b>Job Title:</b> ${user.jobtitle}</p>
-        <p><b>Business Title:</b> ${user.businesstitle}</p>
-      `;
+      let html = "";
 
-      if (safetyNetApplied) {
-        output += `
-          <p style="color:#b00;"><i>User not found in CSV. Safety net applied:
-          Academic & Administrative Professional Users​ – Core persona.</i></p>
-        `;
+      html += "<div class='resultCard'>";
+      html += "<h3>User Information</h3>";
+      html += "<p><b>Harvard ID:</b> " + id + "</p>";
+      html += "<p><b>Name:</b> " + user.name + "</p>";
+      html += "<p><b>Class:</b> " + user.classdescription + "</p>";
+      html += "<p><b>Job Family:</b> " + user.jobfamily + "</p>";
+      html += "<p><b>Job Title:</b> " + user.jobtitle + "</p>";
+      html += "<p><b>Business Title:</b> " + user.businesstitle + "</p>";
+
+      if (safetyNetUsed) {
+        html += "<p style='color:#b00;'><i>User not found in CSV. Safety net applied: Academic & Administrative Professional Users – Core.</i></p>";
       }
 
-      output += `
-        <hr>
-        <h3>Persona:</h3>
-        <p><b>Persona Label:</b> ${personaLabel}</p>
-        <p><b>Persona Group for Devices:</b> <span style="color:#A51C30;">${personaGroup}</span></p>
-        <h3>Recommended Devices</h3>
-      `;
+      html += "<hr>";
+
+      html += "<h3>Persona</h3>";
+      html += "<p><b>Persona Label:</b> " + personaLabel + "</p>";
+      html += "<p><b>Persona Group for Devices:</b> <span style='color:#A51C30;'>" + personaGroup + "</span></p>";
+
+      html += "<h3>Recommended Devices</h3>";
 
       if (devices.length === 0) {
-        output += `<p>No devices configured for persona group "${personaGroup}".</p>`;
+        html += "<p>No devices found for this persona group.</p>";
       } else {
-        devices.forEach(device => {
-          output += `
-            <div class="device">
-              <a href="${device.url}" target="_blank">${device.name}</a>
-            </div>
-          `;
-        });
+        for (let i = 0; i < devices.length; i++) {
+          const device = devices[i];
+          html += "<div class='device'>";
+          html += "<a href='" + device.url + "' target='_blank'>" + device.name + "</a>";
+          html += "</div>";
+        }
       }
 
-      resultDiv.innerHTML = `<div class="resultCard">${output}</div>`;
+      html += "</div>";
+
+      resultDiv.innerHTML = html;
     }
 
-    loadUsersFromEmbeddedCSV();
+    loadUsersFromCSV();
 
     document.getElementById("harvardID").addEventListener("keypress", function (event) {
       if (event.key === "Enter") {
