@@ -167,3 +167,131 @@
           return titlePersonaMap[key];
         }
       }
+      return "Core";
+    }
+
+    function capitalize(str) {
+      if (!str) return "";
+      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    }
+
+    async function loadUsers() {
+      try {
+        const response = await fetch("users.csv");
+        if (!response.ok) throw new Error("File not found");
+
+        const data = await response.text();
+        const rows = data.split("\n").slice(1); // skip header
+
+        rows.forEach(row => {
+          if (!row.trim()) return;
+          const cols = row.split(",");
+
+          // Expected CSV: Harvard ID,Name,classdescription,jobfamily,jobtitle,businesstitle,persona
+          const id = (cols[0] || "").trim();
+          if (!id) return;
+
+          const name = (cols[1] || "Unknown").trim();
+          const classdescription = (cols[2] || "Unknown").trim();
+          const jobfamily = (cols[3] || "Unknown").trim();
+          const jobtitle = (cols[4] || "Unknown").trim();
+          const businesstitle = (cols[5] || "Unknown").trim();
+          const personaRaw = (cols[6] || "").trim();
+
+          // Use persona from CSV if present; otherwise infer from job title
+          let persona = personaRaw
+            ? capitalize(personaRaw)
+            : inferPersonaFromTitle(jobtitle);
+
+          users[id] = {
+            name,
+            classdescription,
+            jobfamily,
+            jobtitle,
+            businesstitle,
+            persona
+          };
+        });
+
+        console.log("Users loaded successfully");
+        document.getElementById("lookupBtn").disabled = false;
+
+      } catch (error) {
+        console.error("Error loading CSV:", error);
+        document.getElementById("result").innerHTML =
+          "<p style='color:red;'>Error: Could not load user data. Check if users.csv is in the correct folder.</p>";
+        document.getElementById("lookupBtn").disabled = false;
+      }
+    }
+
+    // SINGLE, CLEAN lookupUser
+    function lookupUser() {
+      const id = document.getElementById("harvardID").value.trim();
+      const resultDiv = document.getElementById("result");
+
+      if (!id) {
+        resultDiv.innerHTML = "<p>Please enter a Harvard ID.</p>";
+        return;
+      }
+
+      let user = users[id];
+
+      // SAFETY NET: Unfound Harvard ID → Academic & Administrative Professional Users - Core
+      if (!user) {
+        user = {
+          name: "Not found in HR file",
+          classdescription: "N/A",
+          jobfamily: "Academic & Administrative Professional Users​",
+          jobtitle: "N/A",
+          businesstitle: "N/A",
+          persona: "Core"   // Safety net persona
+        };
+      }
+
+      const persona = user.persona || "Core";
+      const personaKey = persona; // already capitalized above
+      const devices = deviceMatrix[personaKey] || [];
+
+      let output = `
+        <h3>User Information</h3>
+        <p><b>Harvard ID:</b> ${id}</p>
+        <p><b>Name:</b> ${user.name}</p>
+        <p><b>Class:</b> ${user.classdescription}</p>
+        <p><b>Job Family:</b> ${user.jobfamily}</p>
+        <p><b>Job Title:</b> ${user.jobtitle}</p>
+        <p><b>Business Title:</b> ${user.businesstitle}</p>
+        ${users[id] ? "" : "<p style='color:#b00;'><i>User not found in CSV. Safety net applied: Academic & Administrative Professional Users​ – Core persona.</i></p>"}
+        <hr>
+        <h3>Persona: <span style="color: #A51C30;">${persona}</span></h3>
+        <h3>Recommended Devices</h3>
+      `;
+
+      if (devices.length === 0) {
+        output += `<p>No devices configured for persona "${personaKey}".</p>`;
+      } else {
+        devices.forEach(device => {
+          output += `
+            <div class="device">
+              <a href="${device.url}" target="_blank">${device.name}</a>
+            </div>
+          `;
+        });
+      }
+
+      resultDiv.innerHTML = `<div class="resultCard">${output}</div>`;
+    }
+
+    // Load CSV on page load
+    loadUsers();
+
+    // Allow Enter key to trigger lookup
+    document.getElementById("harvardID").addEventListener("keypress", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        lookupUser();
+      }
+    });
+  </script>
+</body>
+
+</html>
