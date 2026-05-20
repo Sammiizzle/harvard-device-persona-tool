@@ -6,11 +6,11 @@
   <title>Harvard Device Recommendation Tool</title>
   <style>
     body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #f5f5f5;
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
     }
 
     .topbar {
@@ -123,176 +123,47 @@
   </div>
 
   <script>
-  let users = {};
+    let users = {};
 
-  const deviceMatrix = {
-    Fixed: [
-      { name: "Dell Pro Slim Desktop", url: "https://www.dell.com/en-us/shop/desktop-computers/dell-pro-slim-desktop/spd/dell-pro-qcs1250-slim-desktop" },
-      { name: "Dell Pro All-in-One", url: "https://www.dell.com/en-us/shop/desktop-computers/dell-pro-24-all-in-one-plus-desktop/spd/dell-pro-qb24250-aio" },
-      { name: "iMac M4 Pro", url: "https://www.apple.com/shop/buy-mac/imac" }
-    ],
-    Core: [
-      { name: "Dell Pro Plus 13/14", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-13-plus-laptop-or-2-in-1/spd/dell-pro-pb13250-2-in-1-laptop/bts114_pb13250_usx" },
-      { name: "MacBook Air M4", url: "https://www.apple.com/macbook-air/" },
-      { name: "MacBook Pro 14 M4 Pro", url: "https://www.apple.com/shop/buy-mac/macbook-pro" }
-    ],
-    Mobile: [
-      { name: "Dell Pro 13 Premium", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-13-premium-laptop/spd/dell-pro-13-premium" },
-      { name: "MacBook Air M4", url: "https://www.apple.com/macbook-air/" }
-    ],
-    Advanced: [
-      { name: "Dell Pro Max 14/16", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-max-14-laptop/spd/dell-pro-max-mc14250-laptop" },
-      { name: "MacBook Pro 14 M4 Pro", url: "https://www.apple.com/shop/buy-mac/macbook-pro" }
-    ]
-  };
+    // Device options by persona
+    const deviceMatrix = {
+      Fixed: [
+        { name: "Dell Pro Slim Desktop", url: "https://www.dell.com/en-us/shop/desktop-computers/dell-pro-slim-desktop/spd/dell-pro-qcs1250-slim-desktop" },
+        { name: "Dell Pro All-in-One", url: "https://www.dell.com/en-us/shop/desktop-computers/dell-pro-24-all-in-one-plus-desktop/spd/dell-pro-qb24250-aio" },
+        { name: "iMac M4 Pro", url: "https://www.apple.com/shop/buy-mac/imac" }
+      ],
+      Core: [
+        { name: "Dell Pro Plus 13/14", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-13-plus-laptop-or-2-in-1/spd/dell-pro-pb13250-2-in-1-laptop/bts114_pb13250_usx" },
+        { name: "MacBook Air M4", url: "https://www.apple.com/macbook-air/" },
+        { name: "MacBook Pro 14 M4 Pro", url: "https://www.apple.com/shop/buy-mac/macbook-pro" }
+      ],
+      Mobile: [
+        { name: "Dell Pro 13 Premium", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-13-premium-laptop/spd/dell-pro-13-premium" },
+        { name: "MacBook Air M4", url: "https://www.apple.com/macbook-air/" }
+      ],
+      Advanced: [
+        { name: "Dell Pro Max 14/16", url: "https://www.dell.com/en-us/shop/dell-laptops/dell-pro-max-14-laptop/spd/dell-pro-max-mc14250-laptop" },
+        { name: "MacBook Pro 14 M4 Pro", url: "https://www.apple.com/shop/buy-mac/macbook-pro" }
+      ]
+    };
 
-  const titlePersonaMap = {
-    "administrative": "Core",
-    "coordinator": "Core",
-    "engineer": "Advanced",
-    "developer": "Advanced",
-    "director": "Advanced",
-    "manager": "Advanced",
-    "research": "Mobile",
-    "lab": "Mobile"
-  };
+    // Optional inference from title if CSV persona missing
+    const titlePersonaMap = {
+      "administrative": "Core",
+      "coordinator": "Core",
+      "engineer": "Advanced",
+      "developer": "Advanced",
+      "director": "Advanced",
+      "manager": "Advanced",
+      "research": "Mobile",
+      "lab": "Mobile"
+    };
 
-  function inferPersonaFromTitle(title) {
-    if (!title) return "Core";
-
-    const cleanTitle = title.toLowerCase();
-    for (const key in titlePersonaMap) {
-      if (cleanTitle.includes(key)) {
-        return titlePersonaMap[key];
+    function inferPersonaFromTitle(title) {
+      if (!title) return "Core";
+      const cleanTitle = title.toLowerCase();
+      for (const key in titlePersonaMap) {
+        if (cleanTitle.includes(key)) {
+          return titlePersonaMap[key];
+        }
       }
-    }
-    return "Core";
-  }
-
-  function lookupUser() {
-    const idInput = document.getElementById("harvardID").value.trim();
-    const resultDiv = document.getElementByID("result");
-
-    const user = users[idInput];
-
-    if (!user) {
-      resultDiv.innterHTML = '<p class="error">Harvard ID not found.</p>';
-      return;
-    }
-
-  const persona = inferPersonaFromTitle(user.title);
-  const recommendedDevices = deviceMatrix[persona] || [];
-
-  let devicesHtml = recommendedDevices.map(dev =>
-    '<li><a href="${dev.url}" target="_blank">${dev.name}</a></li>'
-    ).join(' ');
-
-    resultDiv.innterHTML = '
-      <h2>Results for ${capitalize(user.name)}
-      <p><strong>Job Title:</strong> ${user.title || 'Not Available'}</p>
-      <p><strong>Assigned Persona:</strong> <span class="persona-tag">${persona}</span></p>
-      <h3>Recommended Refresh Devices:</h3>
-      <ul>${devicesHtml}</ul>
-    `;
-  }
-  
-  function capitalize(str) {
-    if (!str) return "";
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-  }
-
-  async function loadUsers() {
-    try {
-      const response = await fetch("users.csv");
-      if (!response.ok) throw new Error("File not found");
-      const data = await response.text();
-      const rows = data.split("\n").slice(1);
-
-      rows.forEach(row => {
-        if (!row.trim()) return;
-        const cols = row.split(",");
-        const id = cols[0].trim();
-        users[id] = {
-          name: cols[1] || "Unknown",
-          classdescription: cols[2] || "Unknown",
-          jobfamily: cols[3] || "Unknown",
-          jobtitle: cols[4] || "Unknown",
-          businesstitle: cols[5] || "Unknown",
-          persona: cols[7] ? capitalize(cols[7].trim()) : inferPersonaFromTitle(cols[3] || "")
-        };
-      });
-
-      console.log("Users loaded successfully");
-      document.getElementById("lookupBtn").disabled = false;
-
-    } catch (error) {
-      console.error("Error loading CSV:", error);
-      document.getElementById("result").innerHTML = "<p style='color:red;'>Error: Could not load user data. Check if users.csv is in the correct folder.</p>";
-      document.getElementById("lookupBtn").disabled = false;
-    }
-  }
-
-  function lookupUser() {
-    let id = document.getElementById("harvardID").value.trim();
-    if (!id) {
-      document.getElementById("result").innerHTML = "<p>Please enter a Harvard ID.</p>";
-      return;
-    }
-
-    let user = users[id];
-    let persona;
-
-    if (!user) {
-      let title = prompt("User not found. Enter job title to estimate persona:");
-      if (!title) {
-        document.getElementById("result").innerHTML = "<p>No job title provided.</p>";
-        return;
-      }
-      persona = inferPersonaFromTitle(title);
-      user = {
-        name: "Prototype User",
-        jobCode: "Unknown",
-        jobTitle: title,
-        jobClass: "Estimated",
-        jobFamily: "Estimated",
-        level: "Estimated",
-        persona: persona
-      };
-    } else {
-      persona = user.persona;
-    }
-
-    let personaKey = capitalize(persona);
-    let devices = deviceMatrix[personaKey] || [];
-
-    let output = `
-      <h3>User Information</h3>
-      <p><b>Name:</b> ${user.name}</p>
-      <p><b>Class:</b> ${user.classdescription}</p>
-      <p><b>Job Family:</b> ${user.jobfamily}</p>
-      <p><b>Job Title:</b> ${user.jobtitle}</p>
-      <p><b>Business Title:</b> ${user.businesstitle}</p>
-      <hr>
-      
-      <h3><b>Persona: <span style="color: #A51C30;">${user.persona}</span></h3>
-      <h3>Recommended Devices</h3>`;
-
-    devices.forEach(device => {
-      output += `<div class="device"><a href="${device.url}" target="_blank">${device.name}</a></div>`;
-    });
-
-    document.getElementById("result").innerHTML = `<div class="resultCard">${output}</div>`;
-  }
-
-  loadUsers();
-
-  document.getElementById("harvardID").addEventListener("keypress", function(event) {
-    if (event.key === "Enter") {
-      event.preventDefault(); 
-      lookupUser();
-    }
-  });
-</script>
-</body>
-
-</html>
