@@ -158,13 +158,44 @@
   };
 
   function inferPersonaFromTitle(title) {
-    title = title.toUpperCase();
+    if (!title) return "Core";
+
+    const cleanTitle = title.toLowerCase();
     for (const key in titlePersonaMap) {
-      if (title.includes(key)) return titlePersonaMap[key];
+      if (cleanTitle.includes(key)) {
+        return titlePersonaMap[key];
+      }
     }
     return "Core";
   }
 
+  function lookupUser() {
+    const idInput = document.getElementById("harvardID").value.trim();
+    const resultDiv = document.getElementByID("result");
+
+    const user = users[idInput];
+
+    if (!user) {
+      resultDiv.innterHTML = '<p class="error">Harvard ID not found.</p>';
+      return;
+    }
+
+  const persona = inferPersonaFromTitle(user.title);
+  const recommendedDevices = deviceMatrix[persona] || [];
+
+  let devicesHtml = recommendedDevices.map(dev =>
+    '<li><a href="${dev.url}" target="_blank">${dev.name}</a></li>'
+    ).join(' ');
+
+    resultDiv.innterHTML = '
+      <h2>Results for ${capitalize(user.name)}
+      <p><strong>Job Title:</strong> ${user.title || 'Not Available'}</p>
+      <p><strong>Assigned Persona:</strong> <span class="persona-tag">${persona}</span></p>
+      <h3>Recommended Refresh Devices:</h3>
+      <ul>${devicesHtml}</ul>
+    `;
+  }
+  
   function capitalize(str) {
     if (!str) return "";
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
